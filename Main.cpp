@@ -207,6 +207,19 @@ void enterAccount(listAcc* list, FILE* fd = stdin)
 	}
 }
 
+void print(listAcc* list, FILE* fd = stdout)
+{
+	if (fd = stdout)
+		fprintf(fd, "Name\t\tAccount\tAmount\n");
+
+	listAcc* item = list;
+	while (item != NULL)
+	{
+		fprintf(fd, "%20s\t\t%d\t%.2f\n", item->acc.name, item->acc.numberAccount, item->acc.amount);
+		item = item->next;
+	}
+}
+
 int main()
 {
 
