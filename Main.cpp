@@ -9,6 +9,8 @@ struct date
 {
 	int dd, mm, yy;
 
+	date() {}	
+
 	date(int day = 0, int mounth = 0, int year = 0)
 	{
 		dd = day;
@@ -91,6 +93,12 @@ struct account
 	int numberAccount;
 	float amount;
 
+	account()
+	{
+		numberAccount = countAccount;
+		countAccount++;
+	}
+
 	account(char* curName, float curAmount = 0)
 	{
 		int tmpLen = strlen(curName);
@@ -104,9 +112,6 @@ struct account
 			name = new char[tmpLen];
 			strcpy(name, curName);
 		}
-
-		numberAccount = countAccount;
-		countAccount++;
 		amount = curAmount;
 	}
 
@@ -154,3 +159,55 @@ struct listAcc
 		next = NULL;
 	}
 };
+
+void initListAcc(listAcc* next)
+{
+	next = NULL;
+}
+
+void addListAcc(listAcc* list, account curAcc)
+{
+	listAcc* tmp = new listAcc;
+	tmp->next = list;
+	tmp->acc = curAcc;
+	list = tmp;
+}
+
+void rmListAcc(listAcc* list, listAcc* item)
+{
+	listAcc* tmp = list;
+	while (tmp->next != item && tmp->next != NULL)
+		tmp = tmp->next;
+	listAcc* tmpS = tmp->next;
+	tmp->next = tmp->next->next;
+	delete tmpS;
+}
+
+void enterAccount(listAcc* list, FILE* fd = stdin)
+{
+	account* acc = new account;
+	if (fd == stdin)
+	{
+		fprintf(stdout, "Write name: ");
+		fscanf_s(fd, "%s", &acc->name);
+
+		fprintf(stdout, "Write amount: ");
+		fscanf_s(fd, "%f", &acc->amount);
+
+		fprintf(stdout, "For this account was created id(number account): %d\n", acc->numberAccount);
+	}
+	else
+	{
+		countAccount--;
+		while (feof(fd))
+		{
+			fscanf_s(fd, "%s%d%d", &acc->name, &acc->numberAccount, &acc->amount);
+			addListAcc(list, *acc);
+		}
+	}
+}
+
+int main()
+{
+
+}
