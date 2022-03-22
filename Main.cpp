@@ -84,3 +84,62 @@ struct date
 		return 0;
 	}
 };
+
+struct account
+{
+	char* name;
+	int numberAccount;
+	float amount;
+
+	account(char* curName, float curAmount = 0)
+	{
+		int tmpLen = strlen(curName);
+		if (tmpLen <= 0)
+		{
+			name = new char[1];
+			name[0] = '\0';
+		}
+		else
+		{
+			name = new char[tmpLen];
+			strcpy(name, curName);
+		}
+
+		numberAccount = countAccount;
+		countAccount++;
+		amount = curAmount;
+	}
+
+	void set(char* curName, float curAmount = 0)
+	{
+		int tmpLen = strlen(curName);
+		if (tmpLen != 0)
+		{
+			delete name;
+			name = new char[tmpLen];
+			strcpy(name, curName);
+
+			amount = curAmount;
+		}
+	}
+
+	void setAmount(float curAmount)
+	{
+		amount = curAmount;
+	}
+
+	int getAmount()
+	{
+		return amount;
+	}
+
+	int getAccount()
+	{
+		return numberAccount;
+	}
+
+	char* getName()
+	{
+		return name;
+	}
+};
