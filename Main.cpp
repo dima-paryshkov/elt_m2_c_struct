@@ -143,3 +143,14 @@ struct account
 		return name;
 	}
 };
+
+struct listAcc
+{
+	account acc;
+	listAcc* next;
+
+	listAcc()
+	{
+		next = NULL;
+	}
+};
