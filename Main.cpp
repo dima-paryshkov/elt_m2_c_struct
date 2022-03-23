@@ -119,7 +119,7 @@ struct account
 		amount = curAmount;
 	}
 
-	int getAmount()
+	float getAmount()
 	{
 		return amount;
 	}
@@ -217,10 +217,11 @@ listAcc* print(listAcc* list, FILE* fd = stdout)
 
 	if (fd == stdout)
 	{
-		fprintf(fd, "Name\t\tAccount\tAmount\t date\n");
+		fprintf(fd, "¹\tName\t\tAccount\tAmount\t date\n");
+		int i = 1;
 		while (item->next != NULL)
 		{
-			fprintf(fd, "%s\t\t%d\t%.2f\t%d.%d.%d\n", item->acc.name, item->acc.numberAccount, item->acc.amount, item->acc.lastDate.dd, item->acc.lastDate.mm, item->acc.lastDate.yy);
+			fprintf(fd, "%d\t%s\t\t%d\t%.2f\t%d.%d.%d\n", i++, item->acc.name, item->acc.numberAccount, item->acc.amount, item->acc.lastDate.dd, item->acc.lastDate.mm, item->acc.lastDate.yy);
 			item = item->next;
 		}
 		
@@ -290,6 +291,90 @@ listAcc* sort(listAcc* list, int option)
 	return result;
 }
 
+listAcc* search(listAcc* list, account* item, int option, int* flag)
+{
+	listAcc* tmp = list;
+	while (tmp->next != NULL)
+	{
+		switch (option)
+		{
+		case 1:
+			if (item->amount == tmp->acc.amount)
+				return tmp;
+			break;
+
+		case 2:
+			if (item->numberAccount == tmp->acc.numberAccount)
+				return tmp;
+			break;
+
+		case 3:
+			if (strcmp(tmp->acc.name, item->name) == 0)
+				return tmp;
+			break;
+
+		case 4:
+			if (item->lastDate.yy == tmp->acc.lastDate.yy)
+				if (item->lastDate.mm == tmp->acc.lastDate.mm)
+					if (item->lastDate.dd == tmp->acc.lastDate.dd)
+						return tmp;
+			break;
+
+		}
+		tmp = tmp->next;
+	}
+	tmp = initListAcc();
+	*flag = 0;
+	while (list->next != NULL)
+	{
+		switch (option)
+		{
+		case 1:
+			if (abs((int)(item->amount - list->acc.amount)) < 50)
+			{
+				tmp = addListAcc(tmp, list->acc);
+				(*flag)++;
+			}
+			break;
+
+		case 4:
+			if (item->lastDate.yy == list->acc.lastDate.yy)
+				if (item->lastDate.mm == list->acc.lastDate.mm)
+					if (abs(item->lastDate.dd - list->acc.lastDate.dd) < 5 || abs(item->lastDate.dd - list->acc.lastDate.dd) > 27)
+					{
+						tmp = addListAcc(tmp, list->acc);
+						(*flag)++;
+					}
+					else;
+				else 
+					if (abs(item->lastDate.mm - list->acc.lastDate.mm) < 2)
+						if (abs(item->lastDate.dd - list->acc.lastDate.dd) < 5)
+						{
+							tmp = addListAcc(tmp, list->acc);
+							(*flag)++;
+						}
+			break;
+
+		}
+		list = list->next;
+	}
+	if (flag != 0)
+		return tmp;
+	else 
+		return NULL;
+}
+
+float sym(listAcc* list)
+{
+	float sum = 0;
+	while (list->next != NULL)
+	{
+		sum += list->acc.amount;
+		list = list->next;
+	}
+	return sum;
+}
+
 int main()
 {
 	listAcc* list;
@@ -305,9 +390,10 @@ int main()
 	fprintf(stdout, "Data load from file.\n");
 	int decision;
 	int flag = 1;
+	listAcc* tmp;
 	while (flag)
 	{
-		fprintf(stdout, " 1. Add new account\n 2. Print all account\n 3. Sort table\n 4. Search account\n 5. Delete account\n 6. Edir account\n 7. Calculate and print sum all account\n 8. Exit\n");
+		fprintf(stdout, " 1. Add new account\n 2. Print all account\n 3. Sort table\n 4. Search account\n 5. Delete account\n 6. Edit account\n 7. Calculate and print sum all account\n 8. Exit\n");
 		fscanf(stdin, "%d", &decision);
 
 		switch (decision)
@@ -321,6 +407,7 @@ int main()
 			break;
 
 		case 3:
+		{
 			fprintf(stdout, "Select options for sorting\n 1. Name\n 2. Amount\n 3. Number of account\n 4. Date\n");
 			fscanf(stdin, "%d", &decision);
 			switch (decision)
@@ -347,17 +434,130 @@ int main()
 			}
 			print(list);
 			break;
-
+		}
 		case 4:
+		{
+			listAcc* result;
+			fprintf(stdout, "Select options for search\n 1. Name\n 2. Amount\n 3. Number of account\n 4. Date\n");
+			fscanf(stdin, "%d", &decision);
+			switch (decision)
+			{
+			case 1:
+			{
+				fprintf(stdout, "Write name: ");
+				account accTmp;
+				int* fl = new int;
+				*fl = 0;
+				fscanf(stdin, "%s", &accTmp.name);
+				result = search(list, &accTmp, 3, fl);
+				if (result == NULL)
+					fprintf(stdout, "Data not found.\n");
+				else
+				{
+					fprintf(stdout, "Name\t\tAccount\tAmount\t date\n");
+					fprintf(stdout, "%s\t\t%d\t%.2f\t%d.%d.%d\n", result->acc.name, result->acc.numberAccount, result->acc.amount, result->acc.lastDate.dd, result->acc.lastDate.mm, result->acc.lastDate.yy);
+				}
+				break;
+			}
+
+			case 2:
+			{
+				account accTmp;
+				int* fl = new int;
+				*fl = 0;
+				fprintf(stdout, "Write amount: ");
+				fscanf(stdin, "%f", &accTmp.amount);
+				result = search(list, &accTmp, 1, fl);
+				if (result == NULL)
+					fprintf(stdout, "Data not found.\n");
+				else
+				{
+					if (*fl == 0)
+					{
+						fprintf(stdout, "Name\t\tAccount\tAmount\t date\n");
+						fprintf(stdout, "%s\t\t%d\t%.2f\t%d.%d.%d\n", result->acc.name, result->acc.numberAccount, result->acc.amount, result->acc.lastDate.dd, result->acc.lastDate.mm, result->acc.lastDate.yy);
+					}
+					else
+					{
+						fprintf(stdout, "Data not found. The data below is close to the request. \n");
+						result = sort(result, 1);
+						print(result);
+					}
+
+				}
+			}
 			break;
 
+			case 3:
+			{
+				account accTmp;
+				int* fl = new int;
+				*fl = 0;
+				fprintf(stdout, "Write account: ");
+				fscanf(stdin, "%d", &accTmp.numberAccount);
+				result = search(list, &accTmp, 2, fl);
+				if (result == NULL)
+					fprintf(stdout, "Data not found.\n");
+				else
+				{
+					fprintf(stdout, "Name\t\tAccount\tAmount\t date\n");
+					fprintf(stdout, "%s\t\t%d\t%.2f\t%d.%d.%d\n", result->acc.name, result->acc.numberAccount, result->acc.amount, result->acc.lastDate.dd, result->acc.lastDate.mm, result->acc.lastDate.yy);
+				}
+				break;
+			}
+
+			case 4:
+			{
+				account accTmp;
+				int* fl = new int;
+				*fl = 0;
+				fprintf(stdout, "Write data: ");
+				fscanf(stdin, "%d%d%d", &accTmp.lastDate.dd, &accTmp.lastDate.mm, &accTmp.lastDate.yy);
+				result = search(list, &accTmp, 4, fl);
+				if (result == NULL)
+					fprintf(stdout, "Data not found.\n");
+				else
+				{
+					if (*fl == 0)
+					{
+						fprintf(stdout, "Name\t\tAccount\tAmount\t date\n");
+						fprintf(stdout, "%s\t\t%d\t%.2f\t%d.%d.%d\n", result->acc.name, result->acc.numberAccount, result->acc.amount, result->acc.lastDate.dd, result->acc.lastDate.mm, result->acc.lastDate.yy);
+					}
+					else
+					{
+						fprintf(stdout, "Data not found. The data below is close to the request. \n");
+						result = sort(result, 4);
+						print(result);
+					}
+
+				}
+			}
+			break;
+
+			default:
+				fprintf(stdout, "Incorect point of menu! Try again.\n");
+				break;
+			}
+			break;
+		}
 		case 5:
+		{
+			print(list);
+			fprintf(stdout, "Write id account, which you want delete: ");
+			fscanf(stdin, "%d", &decision);
+			tmp = list;
+			for (int i = 1; i < decision; i++)
+				tmp = tmp->next;
+			list = rmListAcc(list, tmp);
+			print(list);
 			break;
-
+		}
 		case 6:
+
 			break;
 
 		case 7:
+			fprintf(stdout, "Sum on all account is %f\n", sym(list));
 			break;
 
 		case 8:
@@ -378,5 +578,6 @@ int main()
 		print(list, fd);
 	fprintf(stdout, "Data save in file.\n");
 	fclose(fd);
+
 
 }
