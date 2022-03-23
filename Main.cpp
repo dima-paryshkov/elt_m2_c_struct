@@ -553,7 +553,43 @@ int main()
 			break;
 		}
 		case 6:
+			print(list);
+			fprintf(stdout, "Write id account, which you want change: ");
+			fscanf(stdin, "%d", &decision);
+			fprintf(stdout, "Select options for sorting\n 1. Name\n 2. Amount\n 3. Date\n");
+			int option;
+			fscanf(stdin, "%d", &option);
+			tmp = list;
+			for (int i = 1; i < decision; i++)
+				tmp = tmp->next;
 
+			switch (option)
+			{
+			case 1:
+				fprintf(stdout, "Write new name: ");
+				fscanf(stdin, "%s", &tmp->acc.name);
+				fprintf(stdout, "Name\t\tAccount\tAmount\t date\n");
+				fprintf(stdout, "%s\t\t%d\t%.2f\t%d.%d.%d\n", tmp->acc.name, tmp->acc.numberAccount, tmp->acc.amount, tmp->acc.lastDate.dd, tmp->acc.lastDate.mm, tmp->acc.lastDate.yy);
+				break;
+
+			case 2:
+				fprintf(stdout, "Write new amount: ");
+				fscanf(stdin, "%f", &tmp->acc.amount);
+				fprintf(stdout, "Name\t\tAccount\tAmount\t date\n");
+				fprintf(stdout, "%s\t\t%d\t%.2f\t%d.%d.%d\n", tmp->acc.name, tmp->acc.numberAccount, tmp->acc.amount, tmp->acc.lastDate.dd, tmp->acc.lastDate.mm, tmp->acc.lastDate.yy);
+				break;
+
+			case 3:
+				fprintf(stdout, "Write new date: ");
+				fscanf(stdin, "%d%d%d", &tmp->acc.lastDate.dd, &tmp->acc.lastDate.mm, &tmp->acc.lastDate.yy);
+				fprintf(stdout, "Name\t\tAccount\tAmount\t date\n");
+				fprintf(stdout, "%s\t\t%d\t%.2f\t%d.%d.%d\n", tmp->acc.name, tmp->acc.numberAccount, tmp->acc.amount, tmp->acc.lastDate.dd, tmp->acc.lastDate.mm, tmp->acc.lastDate.yy);
+				break;;
+
+			default:
+				fprintf(stdout, "Incorect point of menu! Try again.\n");
+				break;
+			}
 			break;
 
 		case 7:
